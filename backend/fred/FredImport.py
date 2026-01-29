@@ -7,7 +7,7 @@ import yaml
 
 
 
-class fred_import:
+class FredImport:
     class_attribute = "insert static elements"
 
     def __init__(self):
@@ -20,7 +20,6 @@ class fred_import:
             
             config = yaml.safe_load(file)
 
-        try
 
         fred_api_key = config["api_keys"]["fred"]
 
