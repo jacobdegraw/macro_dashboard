@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from pydantic import BaseModel, StringConstraints
 from typing_extensions import Annotated
 from typing import List
@@ -6,11 +6,21 @@ import pandas as pd
 
 class ReleaseDate(BaseModel):
     release_id: int
+    release_name: str
     release_date: date
+    pull_date: datetime
 
 
 class ReleaseDateCollection(BaseModel):
     release_date_list: List[ReleaseDate]
+
+    @classmethod
+    def from_fred_payload(cls, *, payload: dict, pull_date):
+        """
+        Convert a FRED 'release/date' JSON payload into a ReleaseDateCollection.
+        """
+        if pull_date is None:
+            pull_date = datetime.now()
 
     def to_dataframe(self) -> pd.DataFrame:
         """

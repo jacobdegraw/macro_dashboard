@@ -73,6 +73,8 @@ class Settings(BaseSettings):
     fred_base_url: str = "https://api.stlouisfed.org/fred"
     fred_timeout_seconds: int = 10
     fred_retry_count: int = 3
+    fred_rate_limit_per_sec: float = 3.0
+    fred_backoff_max_seconds: float = 30.0
 
     # -------- Mongo --------
     mongo_uri: Optional[str] = Field(default=None, alias="MONGO_URI")

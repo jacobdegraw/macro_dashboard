@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from typing import Any, List, Optional
 from pydantic import BaseModel, Field, field_validator
 import pandas as pd
@@ -10,7 +10,7 @@ class Observation(BaseModel):
         description="Missing values allowed (e.g. '.', None)"
     )
     # TODO: should this go in TimeSeries? How to account for revisions?
-    pull_date: date # type: ignore
+    pull_date: datetime # type: ignore
 
     model_config = {
         "frozen": True
@@ -43,7 +43,7 @@ class TimeSeries(BaseModel):
         - Ignores extra fields in each observation (realtime_start/end, etc.)
         """
         if pull_date is None:
-            pull_date = date.today()
+            pull_date = datetime.now()
 
         obs = []
         for o in payload.get("observations", []):
@@ -51,7 +51,7 @@ class TimeSeries(BaseModel):
             obs.append(
                 Observation(
                     date=o["date"],
-                    value=o.get("value"),
+                    value=o["value"],
                     pull_date=pull_date
                 )
             )

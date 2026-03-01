@@ -1,19 +1,46 @@
 # TODO: add updateddate or smth
 from datetime import date
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 import pandas as pd
 
 class Release(BaseModel):
     id: int
     name: str
     press_release: bool
+    pull_date: date
     # TODO: make sure this is robust
-    link: str
+    link: Optional[str]
+    note: Optional[str]
 
 
 class ReleaseCollection(BaseModel):
     release_list: List[Release]
+
+    @classmethod
+    def from_fred_payload(cls, *, payload: dict, pull_date: Optional[date] = None) -> "ReleaseCollection":
+        """
+        Convert a FRED 'releases' JSON payload into a ReleaseCollection
+        """
+        if pull_date is None:
+            pull_date = date.today()
+
+        releases = []
+
+        for r in payload.get("releases", []):
+            releases.append(
+                Release(
+                    id = r["id"],
+                    name = r["name"],
+                    press_release= r["press_release"],
+                    pull_date= pull_date,
+                    link = r.get("link", None),
+                    note = r.get("note", None)
+                )
+            )
+
+        return cls(release_list=releases)
+
 
     def to_dataframe(self) -> pd.DataFrame:
         """
