@@ -29,17 +29,10 @@ from typing import List
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-# from macro_dashboard.storage.postgres.session import session_scope
-
 @dataclass(frozen=True)
 class TrackedSeriesRepository:
     """
     Repository for CRUD on tracked_series.
-
-    Usage:
-        with session_scope() as session:
-            repo = TrackedSeriesRepository(session)
-            repo.add("CPIAUCSL")
     """
 
     session: Session
@@ -47,10 +40,6 @@ class TrackedSeriesRepository:
     def add(self, series_id: str) -> None:
         """
         Insert series_id into tracked_series.
-
-        Requirements:
-        - Use INSERT ... ON CONFLICT DO NOTHING (since series_id is PK)
-        - Use bind params (:series_id)
         """
 
         stmt = text("""
@@ -63,43 +52,50 @@ class TrackedSeriesRepository:
             stmt,
             {"series_id": series_id}
         )
-        
-
-
 
     def remove(self, series_id: str) -> None:
         """
         Remove series_id from tracked_series.
-
-        Requirements:
-        - Use DELETE ... WHERE series_id = :series_id
-        - It's OK if it deletes 0 rows
         """
-        # TODO: implement
-        raise NotImplementedError
+        stmt = text("""
+            DELETE FROM tracked_series
+            WHERE series_id = :series_id
+        """)
+
+        self.session.execute(
+            stmt,
+            {"series_id": series_id}
+        )
 
     def exists(self, series_id: str) -> bool:
         """
         Return True if series_id exists in tracked_series, else False.
-
-        Requirements:
-        - Use a SELECT that is efficient (e.g., SELECT 1 ... LIMIT 1)
-        - Return a Python bool
         """
-        # TODO: implement
-        raise NotImplementedError
+        stmt = text("""
+            SELECT 1
+            FROM tracked_series
+            WHERE series_id = :series_id
+                    Limit 1
+        """)
+
+        result = self.session.execute(
+            stmt,
+            {"series_id": series_id}
+        )
+
+        row = result.fetchone()
+
+        return row is not None
+
 
     def list_all(self) -> List[str]:
         """
         Return all tracked series_ids.
-
-        Requirements:
-        - Return a list[str]
-        - Suggested SQL: SELECT series_id FROM tracked_series ORDER BY series_id
         """
         stmt = text("""
-            SELECT *
+            SELECT series_id
             FROM tracked_series
+            ORDER BY series_id
         """)
 
         result = self.session.execute(stmt)
