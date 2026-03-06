@@ -1,5 +1,5 @@
 # TODO: add updated date or smth
-from datetime import date
+from datetime import datetime
 from pydantic import BaseModel
 from typing import List
 import pandas as pd
@@ -8,6 +8,7 @@ class SeriesRelease(BaseModel):
     series_id: str
     release_id: int
     release_name: str
+    ingested_at: datetime
 
 
 class SeriesReleaseCollection(BaseModel):
@@ -20,7 +21,8 @@ class SeriesReleaseCollection(BaseModel):
         df = pd.DataFrame({
                 "series_id": [s.series_id for s in self.series_release_list],
                 "release_id": [s.release_id for s in self.series_release_list],
-                "release_name": [s.release_name for s in self.series_release_list]
+                "release_name": [s.release_name for s in self.series_release_list],
+                "ingested_at": [s.ingested_at for s in self.series_release_list]
             }
         )
         return df

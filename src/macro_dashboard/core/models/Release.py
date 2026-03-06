@@ -8,7 +8,7 @@ class Release(BaseModel):
     id: int
     name: str
     press_release: bool
-    pull_date: datetime
+    ingested_at: datetime
     # TODO: make sure this is robust
     link: Optional[str]
     note: Optional[str]
@@ -18,12 +18,12 @@ class ReleaseCollection(BaseModel):
     release_list: List[Release]
 
     @classmethod
-    def from_fred_payload(cls, *, payload: dict, pull_date: Optional[datetime] = None) -> "ReleaseCollection":
+    def from_fred_payload(cls, *, payload: dict, ingested_at: Optional[datetime] = None) -> "ReleaseCollection":
         """
         Convert a FRED 'releases' JSON payload into a ReleaseCollection
         """
-        if pull_date is None:
-            pull_date = datetime.now()
+        if ingested_at is None:
+            ingested_at = datetime.now()
 
         releases = []
 
@@ -33,7 +33,7 @@ class ReleaseCollection(BaseModel):
                     id = r["id"],
                     name = r["name"],
                     press_release= r["press_release"],
-                    pull_date= pull_date,
+                    ingested_at= ingested_at,
                     link = r.get("link", None),
                     note = r.get("note", None)
                 )

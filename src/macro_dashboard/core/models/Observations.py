@@ -10,7 +10,7 @@ class Observation(BaseModel):
         description="Missing values allowed (e.g. '.', None)"
     )
     # TODO: should this go in TimeSeries? How to account for revisions?
-    pull_date: datetime # type: ignore
+    ingested_at: datetime # type: ignore
 
     model_config = {
         "frozen": True
@@ -36,14 +36,14 @@ class TimeSeries(BaseModel):
     observations: List[Observation]
 
     @classmethod
-    def from_fred_payload(cls, *, series_id: str, payload: dict, pull_date: Optional[date] = None) -> "TimeSeries":
+    def from_fred_payload(cls, *, series_id: str, payload: dict, ingested_at: Optional[date] = None) -> "TimeSeries":
         """
         Convert a FRED 'series/observations' JSON payload into a TimeSeries.
 
         - Ignores extra fields in each observation (realtime_start/end, etc.)
         """
-        if pull_date is None:
-            pull_date = datetime.now()
+        if ingested_at is None:
+            ingested_at = datetime.now()
 
         obs = []
         for o in payload.get("observations", []):
@@ -52,7 +52,7 @@ class TimeSeries(BaseModel):
                 Observation(
                     date=o["date"],
                     value=o["value"],
-                    pull_date=pull_date
+                    ingested_at=ingested_at
                 )
             )
 
@@ -67,7 +67,7 @@ class TimeSeries(BaseModel):
                 "series_id": self.series_id,
                 "date": [o.date for o in self.observations],
                 "value": [o.value for o in self.observations],
-                "pull_date": [o.pull_date for o in self.observations]
+                "ingested_at": [o.ingested_at for o in self.observations]
             }
         )
 
