@@ -1,26 +1,3 @@
-"""
-macro_dashboard.storage.postgres.repositories.tracked_series_repository
-
-SQL-first repository for the `tracked_series` table.
-
-Table:
-    tracked_series(
-        series_id varchar(16) primary key
-    )
-
-Design rules:
-- This repo ONLY runs SQL via `session.execute(text(...), params)`.
-- This repo MUST NOT call commit()/rollback(). Transaction boundaries live in
-  `macro_dashboard.storage.postgres.session.session_scope`.
-- All SQL must use bind params (":series_id") — never f-strings.
-
-You will implement:
-- add(series_id): insert into tracked_series, ignore if already exists
-- remove(series_id): delete a tracked series (no error if not present)
-- exists(series_id): return True/False
-- list_all(): return list[str] of series_ids (sorted is fine)
-"""
-
 from __future__ import annotations
 
 from dataclasses import dataclass

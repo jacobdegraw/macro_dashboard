@@ -27,7 +27,9 @@ class Series(BaseModel):
     last_updated: datetime
     popularity: int
     notes: str
-    ingested_at: datetime = Field(default=datetime.now())
+    realtime_start: date
+    realtime_end: date
+    ingested_at: datetime = Field(default_factory=datetime.now)
 
     @field_validator("last_updated", mode="before")
     @classmethod
@@ -73,7 +75,10 @@ class SeriesCollection(BaseModel):
                 "seasonal_adjustment_short": [s.seasonal_adjustment_short for s in self.series_list],
                 "last_updated": [s.last_updated for s in self.series_list],
                 "popularity": [s.popularity for s in self.series_list],
-                "notes": [s.notes for s in self.series_list]
+                "notes": [s.notes for s in self.series_list],
+                "realtime_start": [s.realtime_start for s in self.series_list],
+                "realtime_end": [s.realtime_end for s in self.series_list],
+                "ingested_at": [s.ingested_at for s in self.series_list]
             }
         )
 

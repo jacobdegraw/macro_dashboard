@@ -9,8 +9,6 @@ class Observation(BaseModel):
         None,
         description="Missing values allowed (e.g. '.', None)"
     )
-    # TODO: should this go in TimeSeries? How to account for revisions?
-    ingested_at: datetime # type: ignore
 
     model_config = {
         "frozen": True
@@ -30,10 +28,12 @@ class Observation(BaseModel):
         except (TypeError, ValueError):
             return None
 
-
 class TimeSeries(BaseModel):
     series_id: str
+    realtime_start: date
+    realtime_end: date
     observations: List[Observation]
+    ingested_at: datetime = Field(default_factory=datetime.now)
 
     @classmethod
     def from_fred_payload(cls, *, series_id: str, payload: dict, ingested_at: Optional[date] = None) -> "TimeSeries":
@@ -42,8 +42,8 @@ class TimeSeries(BaseModel):
 
         - Ignores extra fields in each observation (realtime_start/end, etc.)
         """
-        if ingested_at is None:
-            ingested_at = datetime.now()
+        # if ingested_at is None:
+        #     ingested_at = datetime.now()
 
         obs = []
         for o in payload.get("observations", []):
@@ -51,12 +51,13 @@ class TimeSeries(BaseModel):
             obs.append(
                 Observation(
                     date=o["date"],
-                    value=o["value"],
-                    ingested_at=ingested_at
+                    value=o["value"]
                 )
             )
 
-        return cls(series_id=series_id, observations=obs)
+        return cls(series_id=series_id, observations=obs, 
+                   realtime_start=payload.get("realtime_start"), 
+                   realtime_end=payload.get("realtime_end"))
 
     def to_dataframe(self) -> pd.DataFrame:
         """
@@ -67,7 +68,9 @@ class TimeSeries(BaseModel):
                 "series_id": self.series_id,
                 "date": [o.date for o in self.observations],
                 "value": [o.value for o in self.observations],
-                "ingested_at": [o.ingested_at for o in self.observations]
+                "realtime_start": self.realtime_start,
+                "realtime_end": self.realtime_end,
+                "ingested_at": self.ingested_at
             }
         )
 

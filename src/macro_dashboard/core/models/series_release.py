@@ -1,14 +1,16 @@
 # TODO: add updated date or smth
-from datetime import datetime
-from pydantic import BaseModel
+from datetime import datetime, date
+from pydantic import BaseModel, Field
 from typing import List
 import pandas as pd
 
 class SeriesRelease(BaseModel):
     series_id: str
-    release_id: int
-    release_name: str
-    ingested_at: datetime
+    release_id: int = Field(alias = "id")
+    release_name: str = Field(alias = "name")
+    realtime_start: date
+    realtime_end: date
+    ingested_at: datetime = Field(default_factory=datetime.now)
 
 
 class SeriesReleaseCollection(BaseModel):
@@ -22,6 +24,8 @@ class SeriesReleaseCollection(BaseModel):
                 "series_id": [s.series_id for s in self.series_release_list],
                 "release_id": [s.release_id for s in self.series_release_list],
                 "release_name": [s.release_name for s in self.series_release_list],
+                "realtime_start": [s.realtime_start for s in self.series_release_list],
+                "realtime_end": [s.realtime_end for s in self.series_release_list],
                 "ingested_at": [s.ingested_at for s in self.series_release_list]
             }
         )

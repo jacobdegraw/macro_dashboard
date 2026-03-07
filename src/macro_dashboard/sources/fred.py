@@ -11,11 +11,11 @@ from pydantic import ValidationError
 from macro_dashboard.core.settings import get_settings
 
 # Models
-from macro_dashboard.core.models.Series import Series
-from macro_dashboard.core.models.Observations import TimeSeries
-from macro_dashboard.core.models.SeriesRelease import SeriesRelease
-from macro_dashboard.core.models.Release import ReleaseCollection
-from macro_dashboard.core.models.ReleaseDate import ReleaseDateCollection
+from macro_dashboard.core.models.series import Series
+from macro_dashboard.core.models.observations import TimeSeries
+from macro_dashboard.core.models.series_release import SeriesRelease
+from macro_dashboard.core.models.release import ReleaseCollection, Release
+from macro_dashboard.core.models.release_date import ReleaseDateCollection
 
 logger = logging.getLogger(__name__)
 
@@ -203,10 +203,12 @@ class Fred:
         """
         params = {"series_id": series_id}
         data = self._client.get_json("/series/release", params)
-        data["releases"]
+        
+        payload = data["releases"][0]
+        payload["series_id"] = series_id
 
         try:
-            return SeriesRelease.model_validate(data)
+            return SeriesRelease.model_validate(payload)
         except ValidationError as e:
             # Surface schema mismatch clearly
             raise RuntimeError(f"SeriesRelease model validation failed for {series_id}: {e}") from e
@@ -218,10 +220,11 @@ class Fred:
         :param self: Description
         """
 
-        data = self._client.get_json("/releases", {})
+        data = self._client.get_json("/releases", {})["releases"]
 
         try:
-            return ReleaseCollection.from_fred_payload(payload=data)
+            # return ReleaseCollection.from_fred_payload(payload=data)
+            return ReleaseCollection(release_list = [Release.model_validate(r) for r in data])
         except ValidationError as e:
             raise RuntimeError(f"Release pull failed: {e}")
 
@@ -232,7 +235,7 @@ class Fred:
         data = self._client.get_json("/releases/dates", {})
 
         try:
-            return ReleaseDateCollection.from_fred_payload(payload = data)
+            return ReleaseDateCollection.model_validate(data)
         except ValidationError as e:
             raise RuntimeError(f"Release date pull failed: {e}")
 
