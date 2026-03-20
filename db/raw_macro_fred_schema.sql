@@ -33,18 +33,18 @@ create table observations_history(
 
 create table series_current(
 	series_id varchar(16) not null primary key,	
-	title varchar(32) not null,
+	title text not null,
 	observation_start date not null,
 	observation_end date not null,
 	frequency varchar(32) not null,
 	frequency_short varchar(4) not null,
-	units varchar(32) not null,
-	units_short varchar(4) not null,
-	seasonal_adjustment varchar(16) not null,
+	units varchar(64) not null,
+	units_short varchar(32) not null,
+	seasonal_adjustment varchar(32) not null,
 	seasonal_adjustment_short varchar(4) not null,
 	last_updated timestamp not null,
 	popularity integer not null,
-	notes varchar(256) not null,
+	notes text not null,
 	realtime_start date not null,
 	realtime_end date not null,
 	ingested_at timestamp not null
@@ -52,18 +52,18 @@ create table series_current(
 
 create table series_history(
 	series_id varchar(16) not null,	
-	title varchar(32) not null,
+	title text not null,
 	observation_start date not null,
 	observation_end date not null,
 	frequency varchar(32) not null,
 	frequency_short varchar(4) not null,
-	units varchar(32) not null,
-	units_short varchar(4) not null,
-	seasonal_adjustment varchar(16) not null,
+	units varchar(64) not null,
+	units_short varchar(32) not null,
+	seasonal_adjustment varchar(32) not null,
 	seasonal_adjustment_short varchar(4) not null,
 	last_updated timestamp not null,
 	popularity integer not null,
-	notes varchar(256) not null,
+	notes text not null,
 	realtime_start date not null,
 	realtime_end date not null,
 	ingested_at timestamp not null,
@@ -73,7 +73,7 @@ create table series_history(
 create table series_releases_current(
 	series_id varchar(16) not null,
 	release_id int not null,
-	release_name varchar(32) not null,
+	release_name text not null,
 	realtime_start date not null,
 	realtime_end date not null,
 	ingested_at timestamp not null,
@@ -83,7 +83,7 @@ create table series_releases_current(
 create table series_releases_history(
 	series_id varchar(16) not null,
 	release_id int not null,
-	release_name varchar(128) not null,
+	release_name text not null,
 	realtime_start date not null,
 	realtime_end date not null,
 	ingested_at timestamp not null,
@@ -92,10 +92,10 @@ create table series_releases_history(
 
 create table releases_current(
 	release_id int	not null,
-	name varchar(128) not null,
+	name text not null,
 	press_release bool not null,
-	link varchar(32),
-	note varchar(256),
+	link text,
+	note text,
 	realtime_start date not null,
 	realtime_end date not null,
 	ingested_at timestamp not null,
@@ -104,10 +104,10 @@ create table releases_current(
 
 create table releases_history(
 	release_id int	not null,
-	name varchar(128) not null,
+	name text not null,
 	press_release bool not null,
-	link varchar(32),
-	note varchar(256),
+	link text,
+	note text,
 	realtime_start date not null,
 	realtime_end date not null,
 	ingested_at timestamp not null,
@@ -116,7 +116,7 @@ create table releases_history(
 
 create table release_dates_current(
 	release_id int not null primary key,
-	release_name varchar(128) not null,
+	release_name text not null,
 	release_date date not null,
 	realtime_start date not null,
 	realtime_end date not null,
@@ -125,7 +125,7 @@ create table release_dates_current(
 
 create table release_dates_history(
 	release_id int not null,
-	release_name varchar(128) not null,
+	release_name text not null,
 	release_date date not null,
 	realtime_start date not null,
 	realtime_end date not null,

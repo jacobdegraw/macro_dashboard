@@ -115,6 +115,7 @@ class SeriesRepository:
                     :units, :units_short, :seasonal_adjustment, :seasonal_adjustment_short, :last_updated, 
                     :popularity, :notes, :realtime_start, :realtime_end, :ingested_at
                     )
+            ON CONFLICT (series_id, realtime_start) DO NOTHING
         """)
 
         self.session.execute(
@@ -180,7 +181,7 @@ class SeriesRepository:
         if result is None:
             return None
         else:
-            return self._row_to_series(result)
+            return SeriesRepository._row_to_series(result)
 
     
     def get_series_history(self, series_id: str) -> List[Series]:
@@ -201,7 +202,7 @@ class SeriesRepository:
                 {"series_id": series_id}
             )
         
-        return [self._row_to_series(row) for row in result]
+        return [SeriesRepository._row_to_series(row) for row in result]
 
 
     def get_all_current(self) -> List[Series]:
@@ -218,4 +219,4 @@ class SeriesRepository:
 
         result = self.session.execute(stmt)
 
-        return [self._row_to_series(row) for row in result]
+        return [SeriesRepository._row_to_series(row) for row in result]
